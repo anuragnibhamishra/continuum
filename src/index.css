@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+::-webkit-scrollbar {
+  display: none;
+}
+::selection {
+  background-color: #929292;
+  color: #0a0a0a;
+  padding: 20px;
+  margin: 20px;
+}
+button {
+  cursor: pointer;
+}

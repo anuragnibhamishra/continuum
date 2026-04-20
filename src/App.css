@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+::-webkit-scrollbar {
+  display: none;
+}
+::selection {
+  background-color: #D6FFB7; /* purple */
+  color: #0a0a0a;
+  padding: 20px;
+  margin: 20px;
+}
