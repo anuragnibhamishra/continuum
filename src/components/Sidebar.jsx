@@ -40,7 +40,7 @@ function Sidebar() {
             className={({ isActive }) =>
               `w-full flex cursor-pointer items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 text-left ${
                 isActive
-                  ? 'text-neutral-100 bg-purple-600 shadow-lg'
+                  ? 'bg-neutral-800/80 text-purple-500 shadow-lg'
                   : 'text-neutral-400 hover:bg-neutral-800/50 hover:text-neutral-200'
               } ${isCollapsed ? 'justify-center' : ''}`
             }

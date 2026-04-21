@@ -134,6 +134,16 @@ const initialState = loadFromStorage() ?? {
   checkIns: {},
 };
 
+function normalizeCheckInEntry(entry) {
+  if (Array.isArray(entry)) {
+    return entry.reduce((acc, dateKey) => {
+      acc[dateKey] = "success";
+      return acc;
+    }, {});
+  }
+  return entry ?? {};
+}
+
 const habitsSlice = createSlice({
   name: "habits",
   initialState,
@@ -177,21 +187,32 @@ const habitsSlice = createSlice({
     },
     checkIn(state, action) {
       const { habitId, dateKey } = action.payload;
-      if (!state.checkIns[habitId]) state.checkIns[habitId] = [];
-      if (!state.checkIns[habitId].includes(dateKey)) {
-        state.checkIns[habitId].push(dateKey);
-      }
+      if (!state.checkIns[habitId]) state.checkIns[habitId] = {};
+      state.checkIns[habitId] = normalizeCheckInEntry(state.checkIns[habitId]);
+      state.checkIns[habitId][dateKey] = "success";
     },
     uncheck(state, action) {
       const { habitId, dateKey } = action.payload;
       if (state.checkIns[habitId]) {
-        state.checkIns[habitId] = state.checkIns[habitId].filter((d) => d !== dateKey);
+        state.checkIns[habitId] = normalizeCheckInEntry(state.checkIns[habitId]);
+        delete state.checkIns[habitId][dateKey];
+      }
+    },
+    setHabitEntryStatus(state, action) {
+      const { habitId, dateKey, status } = action.payload;
+      if (!state.checkIns[habitId]) state.checkIns[habitId] = {};
+      state.checkIns[habitId] = normalizeCheckInEntry(state.checkIns[habitId]);
+      if (status === "not_checked") {
+        delete state.checkIns[habitId][dateKey];
+      } else {
+        state.checkIns[habitId][dateKey] = status;
       }
     },
   },
 });
 
-export const { addHabit, updateHabit, removeHabit, checkIn, uncheck } = habitsSlice.actions;
+export const { addHabit, updateHabit, removeHabit, checkIn, uncheck, setHabitEntryStatus } =
+  habitsSlice.actions;
 
 export function selectAllHabits(state) {
   return state.habits?.habits ?? [];
@@ -201,14 +222,31 @@ export function selectCheckIns(state) {
   return state.habits?.checkIns ?? {};
 }
 
+export function selectHabitEntryStatus(state, habitId, dateKey) {
+  const checkIns = selectCheckIns(state);
+  const entry = checkIns[habitId];
+  if (Array.isArray(entry)) {
+    return entry.includes(dateKey) ? "success" : "not_checked";
+  }
+  return entry?.[dateKey] ?? "not_checked";
+}
+
+export function selectHabitSuccessDates(state, habitId) {
+  const checkIns = selectCheckIns(state);
+  const entry = checkIns[habitId];
+  if (Array.isArray(entry)) return entry;
+  return Object.entries(entry ?? {})
+    .filter(([, status]) => status === "success")
+    .map(([date]) => date);
+}
+
 export function selectHabitsDueOnDate(state, date) {
   const habits = selectAllHabits(state);
   return habits.filter((h) => isHabitDueOnDate(h, date));
 }
 
 export function selectIsCheckedIn(state, habitId, dateKey) {
-  const checkIns = selectCheckIns(state);
-  return (checkIns[habitId] ?? []).includes(dateKey);
+  return selectHabitEntryStatus(state, habitId, dateKey) === "success";
 }
 
 export default habitsSlice.reducer;
