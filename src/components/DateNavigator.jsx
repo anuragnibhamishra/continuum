@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { IconMenu2 } from '@tabler/icons-react'
 
-function DateNavigator({ selectedDate }) {
+function DateNavigator({ selectedDate, onMenuClick }) {
   const [dateLabel, setDateLabel] = useState('Today')
 
   useEffect(() => {
@@ -27,7 +28,17 @@ function DateNavigator({ selectedDate }) {
 
   return (
     <div className="w-full bg-neutral-950 flex items-center">
-      <h2 className="text-2xl font-bold text-neutral-100">{dateLabel}</h2>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="rounded-lg p-2 text-neutral-300 hover:bg-neutral-800 hover:text-neutral-100 md:hidden"
+          aria-label="Open navigation menu"
+        >
+          <IconMenu2 stroke={1.8} size={22} />
+        </button>
+        <h2 className="text-2xl font-bold text-neutral-100">{dateLabel}</h2>
+      </div>
     </div>
   )
 }

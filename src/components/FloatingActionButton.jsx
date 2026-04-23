@@ -2,7 +2,7 @@ import { IconPlus } from "@tabler/icons-react";
 
 function FloatingActionButton({ onClick }) {
   return (
-    <div className="fixed bottom-8 right-8">
+    <div className="fixed bottom-8 max-sm:bottom-16 right-8 max-sm:right-4">
       <button
         type="button"
         onClick={onClick}

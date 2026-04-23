@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useOutletContext } from "react-router-dom";
 import FloatingActionButton from "../components/FloatingActionButton";
 import DateNavigator from "../components/DateNavigator";
 import DateScroller from "../components/DateScroller";
@@ -54,6 +55,7 @@ function getHabitSuccessDates(entry) {
 
 function TodayPage() {
   const dispatch = useDispatch();
+  const { openMobileMenu } = useOutletContext();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [creationStep, setCreationStep] = useState(CREATION_STEPS.CATEGORY);
@@ -351,7 +353,7 @@ function TodayPage() {
 
   return (
     <div className="h-full flex flex-col gap-8">
-      <DateNavigator selectedDate={selectedDate} />
+      <DateNavigator selectedDate={selectedDate} onMenuClick={openMobileMenu} />
       <DateScroller selectedDate={selectedDate} onDateChange={setSelectedDate} />
 
       <section>

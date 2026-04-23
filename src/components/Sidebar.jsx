@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { IconCalendarCheck, IconTarget, IconRepeat, IconCheckbox, IconFlag, IconTags, IconChartBar, IconClock, IconSettings, IconLayoutSidebarLeftCollapse, IconLayoutSidebarRightCollapse } from '@tabler/icons-react';
 
-const menuItems = [
+export const menuItems = [
   { name: 'Today', path: '/today', icon: <IconCalendarCheck stroke={1.5} /> },
   { name: 'Focus', path: '/focus', icon: <IconTarget stroke={1.5} /> },
   { name: 'Habits', path: '/habits', icon: <IconRepeat stroke={1.5} /> },
@@ -13,11 +13,11 @@ const menuItems = [
   { name: 'Timer', path: '/timer', icon: <IconClock stroke={1.5} /> },
 ]
 
-function Sidebar() {
+function Sidebar({ className = '' }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   
   return (
-    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} h-screen bg-neutral-900 border-r border-neutral-800 flex flex-col transition-all duration-300`}>
+    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} h-screen bg-neutral-900 border-r border-neutral-800 flex flex-col transition-all duration-300 ${className}`}>
       {/* Logo/Header */}
       <div className="p-4 flex border-b border-neutral-800">
         <div className={`w-full flex ${isCollapsed ? 'justify-center' : 'justify-between'} items-center gap-3 ${isCollapsed ? 'px-0' : 'px-4'} py-3 rounded-lg transition-all duration-300 text-left`}>

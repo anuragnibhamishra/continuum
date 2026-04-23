@@ -60,25 +60,30 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full h-screen flex-col bg-neutral-950 flex justify-center items-center">
-      <div className="w-full mb-12 h-fit flex justify-center gap-3 items-center">
-          <img src="favicon.svg" className="w-10" alt="Continuum Logo" />
-          <h1 className="text-3xl text-neutral-50 font-medium">Continuum</h1>
-        </div>
-      <div className="w-md h-fit rounded-3xl p-6 bg-neutral-900 text-neutral-50 font-[Satoshi] flex flex-col justify-center items-center tracking-tighter leading-none">
-        <h1 className="text-2xl text-center">Welcome Back</h1>
-        <p className="text-sm opacity-40">Enter your credentials to continue</p>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-950 px-4 py-10">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-32 -top-32 h-72 w-72 rounded-full bg-purple-600/20 blur-3xl" />
+        <div className="absolute -bottom-40 -right-32 h-80 w-80 rounded-full bg-fuchsia-500/10 blur-3xl" />
+      </div>
 
-        <form
-          className="w-full h-fit mt-10 flex flex-col gap-4 items-center"
-          onSubmit={handleSubmit}
-        >
-          <div className="w-full h-12 rounded-md bg-neutral-800">
+      <div className="relative z-10 w-full max-w-md rounded-3xl border border-neutral-800 bg-neutral-900/90 p-6 text-neutral-50 shadow-2xl backdrop-blur-sm sm:p-8">
+        <div className="mb-8 flex items-center justify-center gap-3">
+          <img src="favicon.svg" className="w-10" alt="Continuum Logo" />
+          <h1 className="text-3xl font-semibold tracking-tight">Continuum</h1>
+        </div>
+
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold text-neutral-100">Welcome Back</h2>
+          <p className="mt-1 text-sm text-neutral-400">Enter your credentials to continue</p>
+        </div>
+
+        <form className="mt-8 flex w-full flex-col gap-4" onSubmit={handleSubmit}>
+          <div className="h-12 w-full rounded-xl border border-neutral-700/70 bg-neutral-800/80 transition-colors focus-within:border-purple-500">
             <input
               type="email"
               placeholder="Email"
               value={email}
-              className="w-full h-full p-3 rounded-md bg-transparent text-neutral-50 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-purple-600"
+              className="h-full w-full rounded-xl bg-transparent px-3 text-neutral-50 placeholder:text-neutral-500 focus:outline-none"
               onChange={(e) => {
                 setEmail(e.target.value);
                 setError("");
@@ -89,12 +94,12 @@ export default function LoginPage() {
             />
           </div>
           
-          <div className="w-full h-12 rounded-md bg-neutral-800 flex items-center relative">
+          <div className="relative flex h-12 w-full items-center rounded-xl border border-neutral-700/70 bg-neutral-800/80 transition-colors focus-within:border-purple-500">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               value={password}
-              className="w-full h-full p-3 pr-12 rounded-md bg-transparent text-neutral-50 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-purple-600"
+              className="h-full w-full rounded-xl bg-transparent px-3 pr-12 text-neutral-50 placeholder:text-neutral-500 focus:outline-none"
               onChange={(e) => {
                 setPassword(e.target.value);
                 setError("");
@@ -105,7 +110,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-neutral-400 hover:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 focus:ring-offset-neutral-800 rounded"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-700/60 hover:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 focus:ring-offset-neutral-800"
               aria-label={showPassword ? "Hide password" : "Show password"}
               tabIndex={-1}
             >
@@ -118,14 +123,18 @@ export default function LoginPage() {
           </div>
 
           <button
-            className="w-full cursor-pointer hover:bg-purple-600 h-12 rounded-md mt-2 bg-purple-700 text-neutral-50 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="mt-2 h-12 w-full cursor-pointer rounded-xl bg-purple-700 font-semibold text-neutral-50 transition-all hover:bg-purple-600 hover:shadow-lg hover:shadow-purple-900/40 disabled:cursor-not-allowed disabled:opacity-50"
             type="submit"
             disabled={loading || !email || !password}
           >
             {loading ? "Logging in..." : "Login"}
           </button>
 
-          {error && <div className="text-red-500 text-sm mt-2 text-center w-full">{error}</div>}
+          {error && (
+            <div className="mt-2 w-full rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-center text-sm text-red-300">
+              {error}
+            </div>
+          )}
         </form>
       </div>
     </div>
