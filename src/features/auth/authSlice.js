@@ -306,5 +306,4 @@ const authSlice = createSlice({
 });
 
 export const { clearError, setInitialized } = authSlice.actions;
-export default authSlice.reducer;
-                                                           
+export default authSlice.reducer;                                                           

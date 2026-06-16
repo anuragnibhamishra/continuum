@@ -26,6 +26,7 @@ const defaults = {
   statsDateKey: toDateKey(new Date()),
   pomodorosToday: 0,
   totalPomodoros: 0,
+  activeTaskId: null,
 };
 
 const loaded = loadFromStorage();
@@ -51,10 +52,17 @@ const timerSlice = createSlice({
       }
       state.totalPomodoros += 1;
     },
+    setActiveTaskId(state, action) {
+      state.activeTaskId = action.payload;
+    },
+    clearActiveTaskId(state) {
+      state.activeTaskId = null;
+    },
   },
 });
 
-export const { setPreset, recordPomodoroComplete } = timerSlice.actions;
+export const { setPreset, recordPomodoroComplete, setActiveTaskId, clearActiveTaskId } =
+  timerSlice.actions;
 
 export function selectTimerStats(state) {
   const t = state.timer ?? {};
@@ -62,6 +70,7 @@ export function selectTimerStats(state) {
     preset: t.preset ?? "long",
     pomodorosToday: t.pomodorosToday ?? 0,
     totalPomodoros: t.totalPomodoros ?? 0,
+    activeTaskId: t.activeTaskId ?? null,
   };
 }
 

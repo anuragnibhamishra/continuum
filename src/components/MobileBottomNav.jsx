@@ -17,7 +17,9 @@ function MobileBottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-800 bg-neutral-900/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 backdrop-blur md:hidden">
       <ul className="grid grid-cols-4 gap-1">
-        {mobilePrimaryNavItems.map(({ name, path, icon: Icon }) => (
+        {mobilePrimaryNavItems.map(({ name, path, icon }) => {
+          const Icon = icon;
+          return (
           <li key={name}>
             <NavLink
               to={path}
@@ -33,7 +35,8 @@ function MobileBottomNav() {
               <Icon stroke={1.8} size={22} />
             </NavLink>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </nav>
   );

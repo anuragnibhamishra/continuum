@@ -1,10 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-function toDateKey(date) {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  return d.toISOString().slice(0, 10);
-}
+import { toDateKey } from "../habits/habitsSlice";
 
 /**
  * Check if a task is due on a given date (for one-off: exact match; for recurring: rule matches).

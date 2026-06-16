@@ -172,19 +172,6 @@ export function usePomodoroTimer() {
 
   const timeLabel = formatTime(timer.time);
 
-  useEffect(() => {
-    const phase =
-      timer.state === "focus"
-        ? "Focus"
-        : getBreakKind(timer.session) === "long"
-          ? "Long break"
-          : "Short break";
-    document.title = `${timeLabel} · ${phase} · Continuum`;
-    return () => {
-      document.title = "Continuum";
-    };
-  }, [timeLabel, timer.state, timer.session]);
-
   const controlsRef = useRef({});
   controlsRef.current = { hasStarted, isRunning, handleStart, handlePause, handleResume };
 

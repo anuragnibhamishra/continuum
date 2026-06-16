@@ -30,7 +30,16 @@ export function isHabitDueOnDate(habit, date) {
 export function toDateKey(date) {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
-  return d.toISOString().slice(0, 10);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/** Parse YYYY-MM-DD as local midnight (avoids UTC parsing quirks). */
+export function parseDateKey(dateKey) {
+  const [y, m, d] = dateKey.split("-").map(Number);
+  return new Date(y, m - 1, d);
 }
 
 /**
@@ -43,21 +52,19 @@ export function computeStreak(dateKeys, frequency, asOfDateKey = toDateKey(new D
   if (!dateKeys || dateKeys.length === 0) return 0;
 
   const sorted = [...dateKeys].sort();
-  const asOf = new Date(asOfDateKey);
-  asOf.setHours(0, 0, 0, 0);
+  const asOf = parseDateKey(asOfDateKey);
 
   let streak = 0;
-  let cursor = asOf;
+  let cursor = new Date(asOf);
 
   if (frequency === "daily") {
     const key = toDateKey(cursor);
     if (!sorted.includes(key)) {
-      // Streak is 0 if today not checked
       const yesterday = new Date(cursor);
       yesterday.setDate(yesterday.getDate() - 1);
       cursor = yesterday;
     }
-    while (cursor.getTime() >= new Date(sorted[0]).getTime()) {
+    while (cursor.getTime() >= parseDateKey(sorted[0]).getTime()) {
       const key = toDateKey(cursor);
       if (sorted.includes(key)) {
         streak++;
@@ -77,14 +84,14 @@ export function computeStreak(dateKeys, frequency, asOfDateKey = toDateKey(new D
     let week = weekStart(cursor);
     const weekKey = toDateKey(week);
     const hasThisWeek = sorted.some((k) => {
-      const w = weekStart(new Date(k));
+      const w = weekStart(parseDateKey(k));
       return toDateKey(w) === weekKey;
     });
     if (!hasThisWeek) {
       week.setDate(week.getDate() - 7);
     }
-    while (week.getTime() >= weekStart(new Date(sorted[0])).getTime()) {
-      const hasWeek = sorted.some((k) => toDateKey(weekStart(new Date(k))) === toDateKey(week));
+    while (week.getTime() >= weekStart(parseDateKey(sorted[0])).getTime()) {
+      const hasWeek = sorted.some((k) => toDateKey(weekStart(parseDateKey(k))) === toDateKey(week));
       if (hasWeek) {
         streak++;
         week.setDate(week.getDate() - 7);
@@ -96,14 +103,14 @@ export function computeStreak(dateKeys, frequency, asOfDateKey = toDateKey(new D
     // monthly: count consecutive months with at least one check-in
     const monthKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     let month = monthKey(cursor);
-    const hasThisMonth = sorted.some((k) => monthKey(new Date(k)) === month);
+    const hasThisMonth = sorted.some((k) => monthKey(parseDateKey(k)) === month);
     if (!hasThisMonth) {
       cursor.setMonth(cursor.getMonth() - 1);
       month = monthKey(cursor);
     }
-    const firstMonth = monthKey(new Date(sorted[0]));
+    const firstMonth = monthKey(parseDateKey(sorted[0]));
     while (month >= firstMonth) {
-      const hasMonth = sorted.some((k) => monthKey(new Date(k)) === month);
+      const hasMonth = sorted.some((k) => monthKey(parseDateKey(k)) === month);
       if (hasMonth) {
         streak++;
         cursor.setMonth(cursor.getMonth() - 1);

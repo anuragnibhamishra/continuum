@@ -1,99 +1,101 @@
 // Auth API Service Layer
-// This abstracts the authentication API calls
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+import {
+  isMockAuthEnabled,
+  mockLoginAPI,
+  mockVerifyTokenAPI,
+  mockRefreshTokenAPI,
+  mockLogoutAPI,
+} from "./authMock";
 
-/**
- * Mock login API - Replace with actual API call
- * @param {Object} credentials - { email, password }
- * @returns {Promise<Object>} - { user, token, refreshToken }
- */
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+
+function requireApiUrl() {
+  if (!API_BASE_URL) {
+    throw new Error(
+      "VITE_API_URL is not configured. Set it in .env or enable VITE_USE_MOCK_AUTH=true for local dev."
+    );
+  }
+}
+
+async function apiFetch(path, options = {}) {
+  requireApiUrl();
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+    ...options,
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data.message || data.error || `Request failed (${res.status})`);
+  }
+
+  return data;
+}
+
 export const loginAPI = async (credentials) => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  if (isMockAuthEnabled()) {
+    return mockLoginAPI(credentials);
+  }
 
-  // Validate input
   if (!credentials.email || !credentials.password) {
     throw new Error("Email and password are required");
   }
 
-  // Mock authentication logic - Email/Password login
-  // Demo credentials: test@continuum.com / 123456
-  if (
-    credentials.email === "anuragmishranibha@gmail.com" &&
-    credentials.password === "Anurag@2608"
-  ) {
-    return {
-      user: {
-        id: 1,
-        name: "Anurag Nibha Mishra",
-        email: credentials.email,
-        avatar: null,
-      },
-      token: "fake-jwt-token-" + Date.now(),
-      refreshToken: "fake-refresh-token-" + Date.now(),
-      expiresIn: 3600, // 1 hour in seconds
-    };
-  }
-
-  // Invalid credentials
-  throw new Error("Invalid email or password");
+  return apiFetch("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({
+      email: credentials.email,
+      password: credentials.password,
+    }),
+  });
 };
 
-/**
- * Verify token validity
- * @param {string} token - JWT token
- * @returns {Promise<Object>} - User data
- */
 export const verifyTokenAPI = async (token) => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 300));
-
-  // Mock token verification
-  if (token && token.startsWith("fake-jwt-token")) {
-    return {
-      user: {
-        id: 1,
-        name: "Anurag Nibha Mishra",
-        email: "anuragmishranibha@gmail.com",
-        avatar: null,
-      },
-    };
+  if (isMockAuthEnabled()) {
+    return mockVerifyTokenAPI(token);
   }
 
-  throw new Error("Invalid or expired token");
+  if (!token) {
+    throw new Error("No token provided");
+  }
+
+  return apiFetch("/auth/verify", {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
 };
 
-/**
- * Refresh access token
- * @param {string} refreshToken - Refresh token
- * @returns {Promise<Object>} - { token, refreshToken, expiresIn }
- */
 export const refreshTokenAPI = async (refreshToken) => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 300));
-
-  if (refreshToken && refreshToken.startsWith("fake-refresh-token")) {
-    return {
-      token: "fake-jwt-token-" + Date.now(),
-      refreshToken: "fake-refresh-token-" + Date.now(),
-      expiresIn: 3600,
-    };
+  if (isMockAuthEnabled()) {
+    return mockRefreshTokenAPI(refreshToken);
   }
 
-  throw new Error("Invalid refresh token");
+  if (!refreshToken) {
+    throw new Error("No refresh token provided");
+  }
+
+  return apiFetch("/auth/refresh", {
+    method: "POST",
+    body: JSON.stringify({ refreshToken }),
+  });
 };
 
-/**
- * Logout API call (optional - for server-side session invalidation)
- * @param {string} token - JWT token
- * @returns {Promise<void>}
- */
 export const logoutAPI = async (token) => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 200));
+  if (isMockAuthEnabled()) {
+    return mockLogoutAPI(token);
+  }
 
-  // In a real app, this would invalidate the token on the server
-  // For now, just return success
-  return { success: true };
+  if (!token) {
+    return { success: true };
+  }
+
+  return apiFetch("/auth/logout", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
 };

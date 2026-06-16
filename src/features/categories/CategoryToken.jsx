@@ -20,7 +20,7 @@ export default function CategoryToken({
       type="button"
       onClick={onClick}
       aria-label={ariaLabel ?? (variant === "add" ? "Add category" : `Category ${label}`)}
-      className="group flex flex-col items-center gap-3 w-[104px] sm:w-[80px] text-left bg-transparent border-0 p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-xl"
+      className="group flex flex-col items-center gap-3 w-26 sm:w-20 text-left bg-transparent border-0 p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-xl"
     >
       <div
         className={[

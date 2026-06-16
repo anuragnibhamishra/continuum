@@ -4,6 +4,7 @@ import habitsReducer from "../features/habits/habitsSlice";
 import tasksReducer from "../features/tasks/tasksSlice";
 import timerReducer from "../features/timer/timerSlice";
 import categoriesReducer from "../features/categories/categoriesSlice";
+import goalsReducer from "../features/goals/goalsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,26 +13,33 @@ export const store = configureStore({
     tasks: tasksReducer,
     timer: timerReducer,
     categories: categoriesReducer,
+    goals: goalsReducer,
   },
 });
 
-// Persist habits and tasks to localStorage on every change
+const PERSIST_KEYS = {
+  habits: "trackwolf_habits",
+  tasks: "trackwolf_tasks",
+  timer: "trackwolf_timer",
+  categories: "trackwolf_categories",
+  goals: "trackwolf_goals",
+};
+
+let persistTimeout = null;
+
 store.subscribe(() => {
-  const state = store.getState();
-  try {
-    if (state.habits) {
-      localStorage.setItem("trackwolf_habits", JSON.stringify(state.habits));
+  if (persistTimeout) clearTimeout(persistTimeout);
+
+  persistTimeout = setTimeout(() => {
+    const state = store.getState();
+    try {
+      for (const [slice, key] of Object.entries(PERSIST_KEYS)) {
+        if (state[slice]) {
+          localStorage.setItem(key, JSON.stringify(state[slice]));
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to persist state", e);
     }
-    if (state.tasks) {
-      localStorage.setItem("trackwolf_tasks", JSON.stringify(state.tasks));
-    }
-    if (state.timer) {
-      localStorage.setItem("trackwolf_timer", JSON.stringify(state.timer));
-    }
-    if (state.categories) {
-      localStorage.setItem("trackwolf_categories", JSON.stringify(state.categories));
-    }
-  } catch (e) {
-    console.warn("Failed to persist habits/tasks", e);
-  }
+  }, 300);
 });
