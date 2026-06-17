@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import {
   IconCheck,
@@ -12,6 +12,7 @@ import {
   selectCheckIns,
   computeStreak,
 } from "../../features/habits/habitsSlice";
+import { useClickOutside } from "../../hooks/useClickOutside";
 
 const ENTRY_OPTIONS = [
   { value: "not_checked", label: "Not Checked", buttonClass: "bg-neutral-800 text-neutral-300" },
@@ -32,6 +33,83 @@ function getHabitSuccessDates(entry) {
     .map(([date]) => date);
 }
 
+function HabitRowMenus({
+  habit,
+  activeStatus,
+  onStatusChange,
+  onEdit,
+  onDelete,
+  isEntryOpen,
+  isActionsOpen,
+  onEntryToggle,
+  onActionsToggle,
+  onEntryClose,
+  onActionsClose,
+}) {
+  const entryRef = useRef(null);
+  const actionsRef = useRef(null);
+
+  useClickOutside(entryRef, onEntryClose, isEntryOpen);
+  useClickOutside(actionsRef, onActionsClose, isActionsOpen);
+
+  return (
+    <>
+      <div className="relative" ref={entryRef}>
+        <button
+          type="button"
+          onClick={onEntryToggle}
+          className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium ${activeStatus.buttonClass}`}
+        >
+          {activeStatus.label}
+          <IconChevronDown size={14} stroke={2} />
+        </button>
+        {isEntryOpen && (
+          <div className="absolute right-0 z-20 mt-2 w-36 rounded-lg border border-neutral-700 bg-neutral-900 p-1 shadow-lg">
+            {ENTRY_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => onStatusChange(habit.id, option.value)}
+                className="w-full rounded-md px-2 py-1.5 text-left text-sm text-neutral-200 hover:bg-neutral-800"
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="relative" ref={actionsRef}>
+        <button
+          type="button"
+          onClick={onActionsToggle}
+          className="rounded-lg p-2 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
+          aria-label="Habit actions"
+        >
+          <IconDotsVertical size={16} stroke={1.8} />
+        </button>
+        {isActionsOpen && (
+          <div className="absolute right-0 z-20 mt-2 w-28 rounded-lg border border-neutral-700 bg-neutral-900 p-1 shadow-lg">
+            <button
+              type="button"
+              onClick={() => onEdit(habit)}
+              className="w-full rounded-md px-2 py-1.5 text-left text-sm text-neutral-200 hover:bg-neutral-800"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              onClick={() => onDelete(habit.id)}
+              className="w-full rounded-md px-2 py-1.5 text-left text-sm text-red-300 hover:bg-neutral-800"
+            >
+              Delete
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
 export default function HabitList({
   habitsDue,
   dateKey,
@@ -44,6 +122,11 @@ export default function HabitList({
   const categories = useSelector(selectAllCategories);
   const [activeEntryMenuHabitId, setActiveEntryMenuHabitId] = useState(null);
   const [activeHabitMenuId, setActiveHabitMenuId] = useState(null);
+
+  const closeAllMenus = useCallback(() => {
+    setActiveEntryMenuHabitId(null);
+    setActiveHabitMenuId(null);
+  }, []);
 
   return (
     <section>
@@ -86,20 +169,19 @@ export default function HabitList({
                     >
                       <CategoryIcon stroke={1.5} size={20} className="text-white" />
                     </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => onToggle(habit.id, checked)}
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
-                        checked
-                          ? "bg-[#7C3AED] text-white"
-                          : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
-                      }`}
-                      aria-label={checked ? "Mark incomplete" : "Mark complete"}
-                    >
-                      {checked ? <IconCheck stroke={2} size={18} /> : null}
-                    </button>
-                  )}
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => onToggle(habit.id, checked)}
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                      checked
+                        ? "bg-[#7C3AED] text-white"
+                        : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
+                    }`}
+                    aria-label={checked ? "Mark incomplete" : "Mark complete"}
+                  >
+                    {checked ? <IconCheck stroke={2} size={18} /> : null}
+                  </button>
                   <div className="flex min-w-0 flex-col">
                     <p className="font-medium text-neutral-100">{habit.title}</p>
                     <span className="text-xs text-neutral-500">
@@ -108,71 +190,34 @@ export default function HabitList({
                     </span>
                   </div>
                 </div>
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setActiveEntryMenuHabitId((prev) => (prev === habit.id ? null : habit.id))
-                    }
-                    className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium ${activeStatus.buttonClass}`}
-                  >
-                    {activeStatus.label}
-                    <IconChevronDown size={14} stroke={2} />
-                  </button>
-                  {activeEntryMenuHabitId === habit.id && (
-                    <div className="absolute right-0 z-20 mt-2 w-36 rounded-lg border border-neutral-700 bg-neutral-900 p-1 shadow-lg">
-                      {ENTRY_OPTIONS.map((option) => (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => {
-                            onStatusChange(habit.id, option.value);
-                            setActiveEntryMenuHabitId(null);
-                          }}
-                          className="w-full rounded-md px-2 py-1.5 text-left text-sm text-neutral-200 hover:bg-neutral-800"
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setActiveHabitMenuId((prev) => (prev === habit.id ? null : habit.id))
-                    }
-                    className="rounded-lg p-2 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
-                    aria-label="Habit actions"
-                  >
-                    <IconDotsVertical size={16} stroke={1.8} />
-                  </button>
-                  {activeHabitMenuId === habit.id && (
-                    <div className="absolute right-0 z-20 mt-2 w-28 rounded-lg border border-neutral-700 bg-neutral-900 p-1 shadow-lg">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onEdit(habit);
-                          setActiveHabitMenuId(null);
-                        }}
-                        className="w-full rounded-md px-2 py-1.5 text-left text-sm text-neutral-200 hover:bg-neutral-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onDelete(habit.id);
-                          setActiveHabitMenuId(null);
-                        }}
-                        className="w-full rounded-md px-2 py-1.5 text-left text-sm text-red-300 hover:bg-neutral-800"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <HabitRowMenus
+                  habit={habit}
+                  activeStatus={activeStatus}
+                  onStatusChange={(id, value) => {
+                    onStatusChange(id, value);
+                    setActiveEntryMenuHabitId(null);
+                  }}
+                  onEdit={(h) => {
+                    onEdit(h);
+                    closeAllMenus();
+                  }}
+                  onDelete={(id) => {
+                    onDelete(id);
+                    closeAllMenus();
+                  }}
+                  isEntryOpen={activeEntryMenuHabitId === habit.id}
+                  isActionsOpen={activeHabitMenuId === habit.id}
+                  onEntryToggle={() => {
+                    setActiveHabitMenuId(null);
+                    setActiveEntryMenuHabitId((prev) => (prev === habit.id ? null : habit.id));
+                  }}
+                  onActionsToggle={() => {
+                    setActiveEntryMenuHabitId(null);
+                    setActiveHabitMenuId((prev) => (prev === habit.id ? null : habit.id));
+                  }}
+                  onEntryClose={() => setActiveEntryMenuHabitId(null)}
+                  onActionsClose={() => setActiveHabitMenuId(null)}
+                />
               </li>
             );
           })}

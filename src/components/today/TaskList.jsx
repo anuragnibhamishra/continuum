@@ -1,9 +1,51 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { IconCheck, IconCheckbox, IconDotsVertical } from "@tabler/icons-react";
+import { useClickOutside } from "../../hooks/useClickOutside";
+
+function TaskRowMenu({ task, onEdit, onDelete }) {
+  const menuRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  useClickOutside(menuRef, () => setMenuOpen(false), menuOpen);
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        type="button"
+        onClick={() => setMenuOpen((prev) => !prev)}
+        className="rounded-lg p-2 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
+        aria-label="Task actions"
+      >
+        <IconDotsVertical size={16} stroke={1.8} />
+      </button>
+      {menuOpen && (
+        <div className="absolute right-0 z-20 mt-2 w-28 rounded-lg border border-neutral-700 bg-neutral-900 p-1 shadow-lg">
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              onEdit(task);
+            }}
+            className="w-full rounded-md px-2 py-1.5 text-left text-sm text-neutral-200 hover:bg-neutral-800"
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              onDelete(task.id);
+            }}
+            className="w-full rounded-md px-2 py-1.5 text-left text-sm text-red-300 hover:bg-neutral-800"
+          >
+            Delete
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function TaskList({ tasksDue, onComplete, onEdit, onDelete }) {
-  const [activeTaskMenuId, setActiveTaskMenuId] = useState(null);
-
   return (
     <section>
       <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-neutral-200">
@@ -44,42 +86,7 @@ export default function TaskList({ tasksDue, onComplete, onEdit, onDelete }) {
                   )}
                 </div>
               </div>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setActiveTaskMenuId((prev) => (prev === task.id ? null : task.id))
-                  }
-                  className="rounded-lg p-2 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
-                  aria-label="Task actions"
-                >
-                  <IconDotsVertical size={16} stroke={1.8} />
-                </button>
-                {activeTaskMenuId === task.id && (
-                  <div className="absolute right-0 z-20 mt-2 w-28 rounded-lg border border-neutral-700 bg-neutral-900 p-1 shadow-lg">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onEdit(task);
-                        setActiveTaskMenuId(null);
-                      }}
-                      className="w-full rounded-md px-2 py-1.5 text-left text-sm text-neutral-200 hover:bg-neutral-800"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onDelete(task.id);
-                        setActiveTaskMenuId(null);
-                      }}
-                      className="w-full rounded-md px-2 py-1.5 text-left text-sm text-red-300 hover:bg-neutral-800"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </div>
+              <TaskRowMenu task={task} onEdit={onEdit} onDelete={onDelete} />
             </li>
           ))}
         </ul>

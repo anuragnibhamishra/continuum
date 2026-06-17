@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   IconBolt,
   IconClock,
@@ -10,16 +10,21 @@ import {
   IconVolume,
   IconVolumeOff,
   IconBeach,
+  IconX,
 } from "@tabler/icons-react";
 import { MODES, PRESET_ORDER, TOTAL_LOOPS } from "../features/timer/constants";
-import { selectTimerStats } from "../features/timer/timerSlice";
+import { clearActiveTaskId, selectTimerStats } from "../features/timer/timerSlice";
+import { selectAllTasks } from "../features/tasks/tasksSlice";
 import { usePomodoroTimerContext } from "../features/timer/PomodoroTimerContext";
 
 const R = 110;
 const C = 2 * Math.PI * R;
 
 function TimerPage() {
-  const { pomodorosToday, totalPomodoros } = useSelector(selectTimerStats);
+  const dispatch = useDispatch();
+  const { pomodorosToday, totalPomodoros, activeTaskId } = useSelector(selectTimerStats);
+  const tasks = useSelector(selectAllTasks);
+  const focusTask = activeTaskId ? tasks.find((t) => t.id === activeTaskId) : null;
   const {
     mode,
     timer,
@@ -76,6 +81,24 @@ function TimerPage() {
           </button>
         </div>
       </header>
+
+      {focusTask && (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-[#7C3AED]/30 bg-[#7C3AED]/10 px-4 py-3">
+          <div className="flex min-w-0 items-center gap-2 text-sm">
+            <IconBolt stroke={1.5} size={18} className="shrink-0 text-[#A78BFA]" />
+            <span className="text-neutral-400">Focusing on:</span>
+            <span className="truncate font-medium text-neutral-100">{focusTask.title}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => dispatch(clearActiveTaskId())}
+            className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
+          >
+            <IconX stroke={1.5} size={14} />
+            Clear
+          </button>
+        </div>
+      )}
 
       <section aria-label="Preset lengths">
         <h2 className="text-lg font-semibold text-neutral-200 mb-3 flex items-center gap-2">

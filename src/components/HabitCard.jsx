@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IconDotsVertical, IconFlame } from "@tabler/icons-react";
 import {
@@ -10,6 +10,7 @@ import {
 } from "../features/habits/habitsSlice";
 import { selectAllCategories } from "../features/categories/categoriesSlice";
 import { getCategoryIconComponent } from "../features/categories/categoryIcons";
+import { useClickOutside } from "../hooks/useClickOutside";
 
 function getLast7Days() {
   const days = [];
@@ -32,7 +33,9 @@ function getFrequencyLabel(frequency) {
 
 function HabitCard({ habit, onEdit, onDelete }) {
   const dispatch = useDispatch();
+  const menuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  useClickOutside(menuRef, () => setMenuOpen(false), menuOpen);
   const categories = useSelector(selectAllCategories);
   const checkIns = useSelector((state) => state.habits.checkIns[habit.id] ?? {});
   const successDates = Object.entries(checkIns)
@@ -97,7 +100,7 @@ function HabitCard({ habit, onEdit, onDelete }) {
             ) : null}
           </div>
         </div>
-        <div className="relative">
+        <div className="relative" ref={menuRef}>
           <button
             type="button"
             onClick={() => setMenuOpen((prev) => !prev)}

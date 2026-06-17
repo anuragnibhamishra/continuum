@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import {
   IconCheck,
@@ -13,6 +13,7 @@ import { selectAllTasks, isTaskDueOnDate } from "../features/tasks/tasksSlice";
 import { useTaskActions } from "../features/tasks/useTaskActions";
 import TaskCreateModal from "../features/tasks/TaskCreateModal";
 import TaskEditModal from "../features/tasks/TaskEditModal";
+import { useClickOutside } from "../hooks/useClickOutside";
 
 function groupTasks(tasks) {
   const today = toDateKey(new Date());
@@ -37,7 +38,9 @@ function groupTasks(tasks) {
 }
 
 function TaskRow({ task, category, onToggle, onEdit, onDelete }) {
+  const menuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  useClickOutside(menuRef, () => setMenuOpen(false), menuOpen);
   const CategoryIcon = category ? getCategoryIconComponent(category.iconKey) : null;
 
   return (
@@ -82,7 +85,7 @@ function TaskRow({ task, category, onToggle, onEdit, onDelete }) {
         </div>
       </div>
 
-      <div className="relative">
+      <div className="relative" ref={menuRef}>
         <button
           type="button"
           onClick={() => setMenuOpen((prev) => !prev)}

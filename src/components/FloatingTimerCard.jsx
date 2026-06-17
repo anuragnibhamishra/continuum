@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   IconBolt,
   IconCoffee,
@@ -8,6 +9,8 @@ import {
   IconBeach,
 } from "@tabler/icons-react";
 import { MODES } from "../features/timer/constants";
+import { selectTimerStats } from "../features/timer/timerSlice";
+import { selectAllTasks } from "../features/tasks/tasksSlice";
 import { usePomodoroTimerContext } from "../features/timer/PomodoroTimerContext";
 
 const R = 36;
@@ -15,6 +18,9 @@ const C = 2 * Math.PI * R;
 
 export default function FloatingTimerCard() {
   const { pathname } = useLocation();
+  const { activeTaskId } = useSelector(selectTimerStats);
+  const tasks = useSelector(selectAllTasks);
+  const focusTask = activeTaskId ? tasks.find((t) => t.id === activeTaskId) : null;
   const {
     mode,
     timer,
@@ -33,13 +39,13 @@ export default function FloatingTimerCard() {
 
   return (
     <div
-      className="fixed top-8 right-8 z-60 w w-fit rounded-2xl border border-neutral-800 bg-neutral-900/95 backdrop-blur-md shadow-2xl shadow-black/40 p-4"
+      className="fixed bottom-24 right-4 z-60 w-fit max-w-[calc(100vw-2rem)] rounded-2xl border border-neutral-800 bg-neutral-900/95 p-4 shadow-2xl shadow-black/40 backdrop-blur-md md:bottom-auto md:right-8 md:top-8"
       role="status"
       aria-live="polite"
     >
       <div className="flex items-start gap-3">
-        <div className="relative shrink-0 grid place-items-center">
-          <svg className="w-20 h-20 -rotate-90" viewBox="0 0 80 80" aria-hidden>
+        <div className="relative grid shrink-0 place-items-center">
+          <svg className="h-20 w-20 -rotate-90" viewBox="0 0 80 80" aria-hidden>
             <circle cx="40" cy="40" r={R} fill="none" strokeWidth="5" className="text-neutral-800" stroke="currentColor" />
             <circle
               cx="40"
@@ -55,12 +61,12 @@ export default function FloatingTimerCard() {
               style={{ transition: "stroke-dashoffset 1s linear" }}
             />
           </svg>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <span className="text-lg font-semibold tabular-nums text-neutral-50">{timeLabel}</span>
           </div>
         </div>
 
-        <div className="flex-1 min-w-0 pt-0.5">
+        <div className="min-w-0 flex-1 pt-0.5">
           <div className="flex items-center gap-1.5 text-xs font-medium text-neutral-300">
             {timer.state === "focus" ? (
               <IconBolt stroke={1.5} className={phaseInfo.accent} size={16} />
@@ -71,9 +77,14 @@ export default function FloatingTimerCard() {
             )}
             <span className={phaseInfo.accent}>{phaseInfo.title}</span>
           </div>
-          <p className="text-[11px] text-neutral-500 mt-0.5 truncate">{preset.label} · {phaseInfo.subtitle}</p>
+          <p className="mt-0.5 truncate text-[11px] text-neutral-500">
+            {preset.label} · {phaseInfo.subtitle}
+          </p>
+          {focusTask && (
+            <p className="mt-1 truncate text-[11px] text-[#A78BFA]">Focus: {focusTask.title}</p>
+          )}
 
-          <div className="flex f items-center gap-2 mt-3">
+          <div className="mt-3 flex items-center gap-2">
             {isRunning ? (
               <button
                 type="button"

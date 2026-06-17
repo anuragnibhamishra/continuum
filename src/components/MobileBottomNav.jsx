@@ -1,15 +1,15 @@
 import { NavLink } from "react-router-dom";
 import {
   IconCalendarCheck,
-  IconRepeat,
-  IconChartBar,
+  IconCheckbox,
+  IconTarget,
   IconClock,
 } from "@tabler/icons-react";
 
 const mobilePrimaryNavItems = [
   { name: "Today", path: "/today", icon: IconCalendarCheck },
-  { name: "Habits", path: "/habits", icon: IconRepeat },
-  { name: "Analytics", path: "/analytics", icon: IconChartBar },
+  { name: "Tasks", path: "/tasks", icon: IconCheckbox },
+  { name: "Focus", path: "/focus", icon: IconTarget },
   { name: "Timer", path: "/timer", icon: IconClock },
 ];
 
@@ -20,21 +20,21 @@ function MobileBottomNav() {
         {mobilePrimaryNavItems.map(({ name, path, icon }) => {
           const Icon = icon;
           return (
-          <li key={name}>
-            <NavLink
-              to={path}
-              className={({ isActive }) =>
-                `flex items-center justify-center rounded-xl py-2 transition-colors ${
-                  isActive
-                    ? "text-purple-500 bg-neutral-800/90"
-                    : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50"
-                }`
-              }
-              aria-label={name}
-            >
-              <Icon stroke={1.8} size={22} />
-            </NavLink>
-          </li>
+            <li key={name}>
+              <NavLink
+                to={path}
+                className={({ isActive }) =>
+                  `flex items-center justify-center rounded-xl py-2 transition-colors ${
+                    isActive
+                      ? "bg-neutral-800/90 text-purple-500"
+                      : "text-neutral-400 hover:bg-neutral-800/50 hover:text-neutral-200"
+                  }`
+                }
+                aria-label={name}
+              >
+                <Icon stroke={1.8} size={22} />
+              </NavLink>
+            </li>
           );
         })}
       </ul>

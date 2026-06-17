@@ -5,10 +5,12 @@ import { IconBolt, IconPlayerPlay } from "@tabler/icons-react";
 import { selectTasksDueOnDate } from "../features/tasks/tasksSlice";
 import { setActiveTaskId } from "../features/timer/timerSlice";
 import { selectTimerStats } from "../features/timer/timerSlice";
+import { usePomodoroTimerContext } from "../features/timer/PomodoroTimerContext";
 
 function FocusPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { handleStart } = usePomodoroTimerContext();
   const today = new Date();
   const tasksDue = useSelector((state) => selectTasksDueOnDate(state, today));
   const { pomodorosToday, activeTaskId } = useSelector(selectTimerStats);
@@ -17,6 +19,7 @@ function FocusPage() {
   const handleStartFocus = () => {
     dispatch(setActiveTaskId(selectedTaskId));
     navigate("/timer");
+    handleStart();
   };
 
   const selectedTask = tasksDue.find((t) => t.id === selectedTaskId);

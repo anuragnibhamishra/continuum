@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { login } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
+import { isMockAuthEnabled } from "../features/auth/authMock";
 
 export default function LoginPage() {
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ export default function LoginPage() {
   const isAuthenticated = auth.isAuthenticated;
   const loginError = auth.error;
   const isInitialized = auth.isInitialized;
+  const mockAuth = isMockAuthEnabled();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -75,6 +77,11 @@ export default function LoginPage() {
         <div className="text-center">
           <h2 className="text-2xl font-semibold text-neutral-100">Welcome Back</h2>
           <p className="mt-1 text-sm text-neutral-400">Enter your credentials to continue</p>
+          {mockAuth && (
+            <p className="mt-2 text-xs text-amber-400/90">
+              Using local mock auth — see .env for credentials.
+            </p>
+          )}
         </div>
 
         <form className="mt-8 flex w-full flex-col gap-4" onSubmit={handleSubmit}>
