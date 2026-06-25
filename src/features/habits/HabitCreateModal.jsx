@@ -64,7 +64,7 @@ export default function HabitCreateModal({ onClose, onSubmit, referenceDate = ne
                       className="flex h-10 w-10 items-center justify-center rounded-[30%]"
                       style={{ backgroundColor: category.color }}
                     >
-                      <Icon stroke={1.5} size={20} className="text-white" />
+                      <Icon stroke={2} size={20} className="text-white" />
                     </span>
                     <span className="text-sm font-medium text-neutral-200">{category.name}</span>
                   </div>

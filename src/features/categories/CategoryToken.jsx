@@ -35,7 +35,7 @@ export default function CategoryToken({
         {variant === "add" ? (
           <span className="text-3xl font-light text-neutral-400 group-hover:text-neutral-200">+</span>
         ) : (
-          Icon && <Icon stroke={1.5} size={40} className="text-white drop-shadow-sm" aria-hidden />
+          Icon && <Icon stroke={2} size={40} className="text-white drop-shadow-sm" aria-hidden />
         )}
       </div>
       <div className="flex w-full flex-col items-center justify-center gap-0.5 px-0.5">

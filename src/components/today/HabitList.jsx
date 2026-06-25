@@ -1,7 +1,6 @@
 import { useRef, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import {
-  IconCheck,
   IconRepeat,
   IconDotsVertical,
   IconChevronDown,
@@ -167,26 +166,18 @@ export default function HabitList({
                       style={{ backgroundColor: category.color }}
                       title={category.name}
                     >
-                      <CategoryIcon stroke={1.5} size={20} className="text-white" />
+                      <CategoryIcon stroke={2} size={20} className="text-white" />
                     </span>
                   ) : null}
-                  <button
-                    type="button"
-                    onClick={() => onToggle(habit.id, checked)}
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
-                      checked
-                        ? "bg-[#7C3AED] text-white"
-                        : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
-                    }`}
-                    aria-label={checked ? "Mark incomplete" : "Mark complete"}
-                  >
-                    {checked ? <IconCheck stroke={2} size={18} /> : null}
-                  </button>
                   <div className="flex min-w-0 flex-col">
                     <p className="font-medium text-neutral-100">{habit.title}</p>
-                    <span className="text-xs text-neutral-500">
-                      {habit.description || habit.frequency}
-                      {streak > 0 ? ` · ${streak} streak` : ""}
+                    <span className="flex flex-wrap items-center gap-2 text-xs text-neutral-500">
+                      <span
+                        className="rounded-full"
+                        style={{ color: category?.color || "#9ca3af"}}
+                      >
+                        {habit.frequency}
+                      </span>
                     </span>
                   </div>
                 </div>
